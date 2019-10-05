@@ -24,3 +24,35 @@ Route::get('/addmore', 'HomeController@addmore')->name('addmore');
 Route::get('/crud', 'HomeController@crud')->name('crud');
 Route::post('/crud', 'HomeController@crudgenarate')->name('crudgenarate');
 
+//site
+
+Route::get('/index', function () {
+    return view('site.pages.index');
+});
+Route::get('/category', function () {
+    return view('site.pages.category');
+});
+Route::get('/about', function () {
+    return view('site.pages.about');
+});
+Route::get('/product/detail', function () {
+    return view('site.pages.product_details');
+});
+Route::get('/shopping/cart', function () {
+    return view('site.pages.shopping_cart');
+});
+Route::get('/checkout', function () {
+    return view('site.pages.checkout');
+});
+Route::get('/account', function () {
+    return view('site.pages.account');
+});
+Route::get('/wishlist', function () {
+    return view('site.pages.wishlist');
+});
+Route::get('/orders_list', function () {
+    return view('site.pages.orders_list');
+});
+Route::get('/register', function () {
+    return view('site.pages.register');
+});

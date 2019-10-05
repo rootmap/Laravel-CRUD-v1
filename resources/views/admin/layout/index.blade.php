@@ -35,6 +35,8 @@
                         </ul>
                         <!-- END Blank Header -->
 
+                        @include('admin.extra.msg')
+
                         <!-- Example Block -->
                         <div class="block">
                             <!-- Example Title -->

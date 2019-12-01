@@ -7,11 +7,12 @@ use Session;
 use Illuminate\Http\Request;
 use Mpdf\Mpdf;
 use Excel;
-
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 use Illuminate\Support\Facades\URL;
+
+use App\PageName;
 
 class CoreCustomController extends Facade {
 
@@ -33,13 +34,23 @@ class CoreCustomController extends Facade {
 
     public static function storeName() 
     {
-        return "NucleusV4";
+        return "CoreCMS";
     }
 
     public static function UserID() 
     {
         return Auth::user()->id;
     }    
+
+
+
+
+    public static function getAvailableMenus(){
+      $tab=PageName::select('name','route_link')->get();
+
+      return $tab;
+    }
+
 
 
     public static function ExcelLayout($excelArray=array())
@@ -95,7 +106,7 @@ class CoreCustomController extends Facade {
                         
                 <td valign="top" style="border-bottom: 5px #000 solid; color: #008000; font-size: 20px; font-weight: bold; padding-left: 0px;">
                 
-                '.$report_name.' : '.self::storeName();.'
+                '.$report_name.' : '.self::storeName().'
                 <hr style="height:5px;">
 
                 <b>Report Genarated : '.formatDateTime(date('Y-m-d H:i:s')).'<br /><br /></b></td>

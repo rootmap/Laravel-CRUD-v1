@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use DB;
+use App\PageName;
 class HomeController extends Controller
 {
     /**
@@ -24,6 +25,22 @@ class HomeController extends Controller
     public function index()
     {
         return view('home');
+    }    
+
+    public function dashboard()
+    {
+        return view('admin.pages.dashboard.index');
+    }
+
+    public function table()
+    {
+        return view('admin.pages.table');
+    }
+
+
+    public function create()
+    {
+        return view('admin.pages.create');
     }
 
     public function site()
@@ -38,7 +55,7 @@ class HomeController extends Controller
 
     public function blank()
     {
-        return view('admin.layout.index');
+        return view('admin.pages.testpage.testpage_create');
     }
 
     public function form()
@@ -55,13 +72,8 @@ class HomeController extends Controller
 
     public function crud()
     {
-        /*$tables = \DB::select('SHOW TABLES');
-
-        $tables = array_map('current',$tables);
-
-        dd($tables);
-        die();*/
-        return view('admin.pages.crud');
+        $tables = PageName::all();
+        return view('admin.pages.crud',['table'=>$tables]);
     }    
 
     private function GenarateWithLink($fileLink='',$content=''){
@@ -117,74 +129,135 @@ class HomeController extends Controller
            if($request->field_type[$key]==1)
            {
                 $content .='
-                        <div class="form-group">
-                            <label class="col-md-3 control-label" for="'.$this->genarateFieldName($field).'">'.$field.'</label>
-                            <div class="col-md-9">
-                                <input type="text" id="'.$this->genarateFieldName($field).'" name="'.$this->genarateFieldName($field).'" class="form-control" placeholder="'.$request->field_name_placeholder[$key].'">
-                            </div>
-                        </div>';
+                        <div class="form-row">
+                            <div class="col-md">
+                                <div class="form-group">
+                                    <label for="inputGroupSelect07" class="" for="'.$this->genarateFieldName($field).'">'.$field.':</label>
+                                    <input type="text" id="'.$this->genarateFieldName($field).'" name="'.$this->genarateFieldName($field).'" class="form-control" placeholder="'.$request->field_name_placeholder[$key].'">
+                                </div><!-- end form-group -->
+                            </div><!-- end column -->
+                        </div><!-- end form-row -->
+                        ';
            }
            elseif($request->field_type[$key]==2)
            {
                 $content .='
                         <div class="form-group">
-                            <label class="col-md-3 control-label" for="'.$this->genarateFieldName($field).'">'.$field.'</label>
-                            <div class="col-md-9">
-                                <textarea id="'.$this->genarateFieldName($field).'" name="'.$this->genarateFieldName($field).'" rows="9" class="form-control" placeholder="'.$request->field_name_placeholder[$key].'"></textarea>
-                            </div>
-                        </div>';
+                                <h4 class="input-group-text left">'.$field.'</h4>
+                                <textarea class="form-control textarea text-left p-3 h-100"
+                                        id="'.$this->genarateFieldName($field).'" name="'.$this->genarateFieldName($field).'" rows="5" placeholder="'.$request->field_name_placeholder[$key].'"></textarea>
+                        </div><!-- end form-group -->
+                        ';
            }
            elseif($request->field_type[$key]==3)
            {
                 $content .='
-                        <div class="form-group">
-                            <label class="col-md-3 control-label">'.$field.'</label>
-                            <div class="col-md-9">
-                                '.$this->genarateStaticCheckbox($this->genarateFieldName($field),$request->field_name_placeholder[$key]).'
+                        <div class="input-group mb-4">
+                          <div class="input-group-prepend">
+                            <div class="input-group-text">
+                              '.$this->genarateStaticCheckbox($this->genarateFieldName($field),$request->field_option[$key]).'
                             </div>
-                        </div>';
+                          </div>
+                          <input type="text" disabled="disabled"  for="'.$this->genarateFieldName($field).'" class="form-control" value="'.$request->field_name_placeholder[$key].'" />
+                        </div>
+                        ';
            }
            elseif($request->field_type[$key]==4)
            {
                 $content .='
-                        <div class="form-group">
-                            <label class="col-md-3 control-label">'.$field.'</label>
-                            <div class="col-md-9">
-                                '.$this->genarateStaticRadioButton($this->genarateFieldName($field),$request->field_name_placeholder[$key]).'
+
+                        <div class="input-group mb-4">
+                          <div class="input-group-prepend">
+                            <div class="input-group-text">
+                              '.$this->genarateStaticRadioButton($this->genarateFieldName($field),$request->field_option[$key]).'
                             </div>
-                        </div>';
+                          </div>
+                          <input type="text" disabled="disabled"  for="'.$this->genarateFieldName($field).'" class="form-control" value="'.$request->field_name_placeholder[$key].'" />
+                        </div>
+                        ';
            }
            elseif($request->field_type[$key]==5)
            {
-                $content .='
-                        <div class="form-group">
-                            <label class="col-md-3 control-label">'.$field.'</label>
-                            <div class="col-md-9">
-                                <select id="'.$this->genarateFieldName($field).'" name="'.$this->genarateFieldName($field).'" class="form-control" size="1">
-                                    '.$this->genarateStaticDropDown($request->field_name_placeholder[$key]).'
-                                </select>
-                            </div>
-                        </div>';
+
+                if($request->field_table[$key]==1){
+
+                    $content .='
+                        <div class="form-row">
+                            <div class="col-md">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <label for="inputGroupSelect01" class="input-group-text" for="'.$this->genarateFieldName($field).'">'.$request->field_name_placeholder[$key].':</label>
+                                        </div>
+                                        <select id="'.$this->genarateFieldName($field).'" name="'.$this->genarateFieldName($field).'" class="custom-select" size="1">
+                                            '.$this->genarateStaticDropDown($request->field_option[$key]).'
+                                        </select>
+                                        <i class="fas fa-angle-down"></i>
+                                    </div>
+                            </div><!-- end form-group -->
+                            </div><!-- end column -->
+                        </div><!-- end form-row -->';
+                }
+                else{
+
+                    $content .='
+                        <div class="form-row">
+                            <div class="col-md">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <label for="inputGroupSelect07" class="input-group-text" for="'.$this->genarateFieldName($field).'">'.$request->field_name_placeholder[$key].':</label>
+                                        </div>
+                                        <select id="'.$this->genarateFieldName($field).'" name="'.$this->genarateFieldName($field).'" class="custom-select" size="1">';
+                                        $content .='
+                                        <option value="">Choose</option>
+                                        @if(isset(&#36;dataRow_'.$request->field_table[$key].'))    
+                                            @if(count(&#36;dataRow_'.$request->field_table[$key].')>0)
+                                                @foreach(&#36;dataRow_'.$request->field_table[$key].' as &#36;'.$request->field_table[$key].')
+                                                    ';
+                                            $datExplodeField=explode(",",$request->field_option[$key]);        
+                                            $content .='<option value="{{&#36;'.$request->field_table[$key].'->'.$datExplodeField[0].'}}">{{&#36;'.$request->field_table[$key].'->'.$datExplodeField[1].'}}</option>
+                                            ';
+                                            $content .='        
+                                                @endforeach
+                                            @endif
+                                        @endif 
+                                        ';
+
+                                        $content .='
+                                        </select>
+                                        <i class="fas fa-angle-down"></i>
+                                    </div>
+                            </div><!-- end form-group -->
+                            </div><!-- end column -->
+                        </div><!-- end form-row -->';                    
+                }
+
+                
            }
            elseif($request->field_type[$key]==6)
            {
                 $content .='
-                        <div class="form-group">
-                            <label class="col-md-3 control-label" for="'.$this->genarateFieldName($field).'">'.$field.'</label>
-                            <div class="col-md-9">
+                        <div class="form-row">
+                            <div class="col-md">
+                                <div class="form-group">
+                                    <label for="inputGroupSelect07" class="" for="'.$this->genarateFieldName($field).'">'.$field.':</label>
                                 <input type="file" id="'.$this->genarateFieldName($field).'" name="'.$this->genarateFieldName($field).'">
-                            </div>
-                        </div>';
+                            </div><!-- end form-group -->
+                            </div><!-- end column -->
+                        </div><!-- end form-row -->';
            }
            elseif($request->field_type[$key]==7)
            {
                 $content .='
-                        <div class="form-group">
-                            <label class="col-md-3 control-label" for="'.$this->genarateFieldName($field).'">'.$field.'</label>
-                            <div class="col-md-9">
+                        <div class="form-row">
+                            <div class="col-md">
+                                <div class="form-group">
+                                    <label for="inputGroupSelect07" class="" for="'.$this->genarateFieldName($field).'">'.$field.':</label>
                                 <input type="file" id="'.$this->genarateFieldName($field).'" name="'.$this->genarateFieldName($field).'">
-                            </div>
-                        </div>';
+                            </div><!-- end form-group -->
+                            </div><!-- end column -->
+                        </div><!-- end form-row -->';
            }
             
         }
@@ -200,10 +273,12 @@ class HomeController extends Controller
            if($request->field_type[$key]==1)
            {
                 $content .='
-                        <div class="form-group">
-                            <label class="col-md-3 control-label" for="'.$this->genarateFieldName($field).'">'.$field.'</label>
-                            <div class="col-md-9">
-                                <input type="text" ';
+                        <div class="form-row">
+                            <div class="col-md">
+                                <div class="form-group">
+                                    <label for="inputGroupSelect07" class="" for="'.$this->genarateFieldName($field).'">'.$field.':</label>
+                                    <input type="text" 
+                                     ';
 
                                 $content .='
                                 <?php 
@@ -215,17 +290,18 @@ class HomeController extends Controller
                                 ?>
                                 ';
 
-                                $content .='id="'.$this->genarateFieldName($field).'" name="'.$this->genarateFieldName($field).'" class="form-control" placeholder="'.$request->field_name_placeholder[$key].'">
-                            </div>
-                        </div>';
+                                $content .=' id="'.$this->genarateFieldName($field).'" name="'.$this->genarateFieldName($field).'" class="form-control" placeholder="'.$request->field_name_placeholder[$key].'">
+                                </div><!-- end form-group -->
+                            </div><!-- end column -->
+                        </div><!-- end form-row -->';
            }
            elseif($request->field_type[$key]==2)
            {
                 $content .='
                         <div class="form-group">
-                            <label class="col-md-3 control-label" for="'.$this->genarateFieldName($field).'">'.$field.'</label>
-                            <div class="col-md-9">
-                                <textarea id="'.$this->genarateFieldName($field).'" name="'.$this->genarateFieldName($field).'" rows="9" class="form-control" placeholder="'.$request->field_name_placeholder[$key].'">';
+                                <h4>'.$field.'</h4>
+                                <textarea class="form-control textarea text-left p-3 h-100"
+                                        id="'.$this->genarateFieldName($field).'" name="'.$this->genarateFieldName($field).'" rows="5" placeholder="'.$request->field_name_placeholder[$key].'">';
                                     $content .='<?php 
                                 if(isset(&#36;dataRow->'.$this->genarateFieldName($field).')){
                                     
@@ -234,65 +310,105 @@ class HomeController extends Controller
                                 }
                                 ?>';
                                 $content .='</textarea>
-                            </div>
-                        </div>';
+                        </div><!-- end form-group -->';
            }
            elseif($request->field_type[$key]==3)
            {
                 $content .='
-                        <div class="form-group">
-                            <label class="col-md-3 control-label">'.$field.'</label>
-                            <div class="col-md-9">
-                                '.$this->genarateStaticCheckbox($this->genarateFieldName($field),$request->field_name_placeholder[$key],$data).'
+                        <div class="input-group mb-4">
+                          <div class="input-group-prepend">
+                            <div class="input-group-text">
+                              '.$this->genarateStaticCheckbox($this->genarateFieldName($field),$request->field_option[$key],$data).'
                             </div>
+                          </div>
+                          <input type="text" disabled="disabled"  for="'.$this->genarateFieldName($field).'" class="form-control" value="'.$request->field_name_placeholder[$key].'" />
                         </div>';
            }
            elseif($request->field_type[$key]==4)
            {
                 $content .='
-                        <div class="form-group">
-                            <label class="col-md-3 control-label">'.$field.'</label>
-                            <div class="col-md-9">
-                                '.$this->genarateStaticRadioButton($this->genarateFieldName($field),$request->field_name_placeholder[$key],$data).'
+
+                        <div class="input-group mb-4">
+                          <div class="input-group-prepend">
+                            <div class="input-group-text">
+                              '.$this->genarateStaticRadioButton($this->genarateFieldName($field),$request->field_option[$key],$data).'
                             </div>
+                          </div>
+                          <input type="text" disabled="disabled"  for="'.$this->genarateFieldName($field).'" class="form-control" value="'.$request->field_name_placeholder[$key].'" />
                         </div>';
            }
            elseif($request->field_type[$key]==5)
            {
-                $content .='
-                        <div class="form-group">
-                            <label class="col-md-3 control-label">'.$field.'</label>
-                            <div class="col-md-9">
-                                <select id="'.$this->genarateFieldName($field).'" name="'.$this->genarateFieldName($field).'" class="form-control" size="1">
-                                    '.$this->genarateStaticDropDown($request->field_name_placeholder[$key],$data,$this->genarateFieldName($field)).'
-                                </select>
-                            </div>
-                        </div>';
+
+                if($request->field_table[$key]==1){
+
+                    $content .='
+                        <div class="form-row">
+                            <div class="col-md">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <label for="inputGroupSelect07" class="" for="'.$this->genarateFieldName($field).'">'.$request->field_name_placeholder[$key].':</label>
+                                        </div>
+                                        <select id="'.$this->genarateFieldName($field).'" name="'.$this->genarateFieldName($field).'" class="custom-select" size="1">
+                                            '.$this->genarateStaticDropDown($request->field_option[$key],$data,$this->genarateFieldName($field)).'
+                                        </select>
+                                        <i class="fas fa-angle-down"></i>
+                                    </div>
+                                </div><!-- end form-group -->
+                            </div><!-- end column -->
+                        </div><!-- end form-row -->';
+                }
+                else{
+
+                    $content .='
+                        <div class="form-row">
+                            <div class="col-md">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <label for="inputGroupSelect07" class="" for="'.$this->genarateFieldName($field).'">'.$request->field_name_placeholder[$key].':</label>
+                                        </div>
+                                        <select id="'.$this->genarateFieldName($field).'" name="'.$this->genarateFieldName($field).'" class="custom-select" size="1">';
+                                        $content .='
+                                        <option value="">Choose</option>
+                                        @if(count(&#36;dataRow_'.$request->field_table[$key].')>0)
+                                            @foreach(&#36;dataRow_'.$request->field_table[$key].' as &#36;'.$request->field_table[$key].')
+                                                ';
+                                        $datExplodeField=explode(",",$request->field_option[$key]);        
+                                        $content .='<option 
+                                        @if(isset(&#36;dataRow->'.$datExplodeField[0].'))
+                                            @if(&#36;dataRow->'.$datExplodeField[0].'==&#36;'.$request->field_table[$key].'->'.$datExplodeField[0].')
+                                                selected="selected" 
+                                            @endif
+                                        @endif 
+                                         value="{{&#36;'.$request->field_table[$key].'->'.$datExplodeField[0].'}}">{{&#36;'.$request->field_table[$key].'->'.$datExplodeField[1].'}}</option>
+                                        ';
+                                        $content .='        
+                                            @endforeach
+                                        @endif
+                                        ';
+
+                                        $content .='
+                                        </select>
+                                        <i class="fas fa-angle-down"></i>
+                                    </div>
+                            </div><!-- end form-group -->
+                            </div><!-- end column -->
+                        </div><!-- end form-row -->';                    
+                }
+
+                
            }
            elseif($request->field_type[$key]==6)
            {
                 $imgEncodeURL="'upload/".strtolower($this->genarateModelName($request->page_name))."/'.&#36;dataRow->".$this->genarateFieldName($field);
                 $content .='
-                        <div class="form-group">
-                            <label class="col-md-3 control-label" for="'.$this->genarateFieldName($field).'">'.$field.'</label>
-                            <div class="col-md-9">
-                                <input type="file" id="'.$this->genarateFieldName($field).'" name="'.$this->genarateFieldName($field).'"> <br />
-                                <input type="hidden" value="{{&#36;dataRow->'.$this->genarateFieldName($field).'}}" name="ex_'.$this->genarateFieldName($field).'" />
-                                @if(isset(&#36;dataRow->'.$this->genarateFieldName($field).'))
-                                    @if(!empty(&#36;dataRow->'.$this->genarateFieldName($field).'))
-                                        <img src="{{url('.$imgEncodeURL.')}}" width="150">
-                                    @endif
-                                @endif
-                            </div>
-                        </div>';
-           }
-           elseif($request->field_type[$key]==7)
-           {
-                $imgEncodeURL="'upload/".strtolower($this->genarateModelName($request->page_name))."/'.&#36;dataRow->".$this->genarateFieldName($field);
-                $content .='
-                        <div class="form-group">
-                            <label class="col-md-3 control-label" for="'.$this->genarateFieldName($field).'">'.$field.'</label>
-                            <div class="col-md-9">
+                        <div class="form-row">
+                            <div class="col-md">
+                                <div class="form-group">
+
+                                    <label for="inputGroupSelect07" class="" for="'.$this->genarateFieldName($field).'">'.$field.':</label>
                                 <input type="file" id="'.$this->genarateFieldName($field).'" name="'.$this->genarateFieldName($field).'">
                                 <input type="hidden" value="{{&#36;dataRow->'.$this->genarateFieldName($field).'}}" name="ex_'.$this->genarateFieldName($field).'" />
                                 @if(isset(&#36;dataRow->'.$this->genarateFieldName($field).'))
@@ -300,8 +416,29 @@ class HomeController extends Controller
                                         <img src="{{url('.$imgEncodeURL.')}}" width="150">
                                     @endif
                                 @endif
-                            </div>
-                        </div>';
+                            </div><!-- end form-group -->
+                            </div><!-- end column -->
+                        </div><!-- end form-row -->';
+           }
+           elseif($request->field_type[$key]==7)
+           {
+                $imgEncodeURL="'upload/".strtolower($this->genarateModelName($request->page_name))."/'.&#36;dataRow->".$this->genarateFieldName($field);
+                $content .='
+
+                        <div class="form-row">
+                            <div class="col-md">
+                                <div class="form-group">
+                                    <label for="inputGroupSelect07" class="" for="'.$this->genarateFieldName($field).'">'.$field.':</label>
+                                <input type="file" id="'.$this->genarateFieldName($field).'" name="'.$this->genarateFieldName($field).'">
+                                <input type="hidden" value="{{&#36;dataRow->'.$this->genarateFieldName($field).'}}" name="ex_'.$this->genarateFieldName($field).'" />
+                                @if(isset(&#36;dataRow->'.$this->genarateFieldName($field).'))
+                                    @if(!empty(&#36;dataRow->'.$this->genarateFieldName($field).'))
+                                        <img src="{{url('.$imgEncodeURL.')}}" width="150">
+                                    @endif
+                                @endif
+                            </div><!-- end form-group -->
+                            </div><!-- end column -->
+                        </div><!-- end form-row -->';
            }
             
             
@@ -344,9 +481,7 @@ $content .='
         $checkBoxArray=explode(",",$param);
         foreach ($checkBoxArray as $key => $value) {
             $content .='
-                                <div class="checkbox">
-                                    <label for="example-checkbox1">
-                                        <input type="checkbox" ';
+                                        &nbsp;<input type="checkbox" ';
 
                                         if(!empty($datafill)){
                                             $content .=' <?php 
@@ -358,9 +493,8 @@ $content .='
                                             ?>';
                                         }
 
-                                       $content .=' id="'.$filedName.'_'.$key.'" name="'.$filedName.'" value="'.trim($value).'"> '.$value.'
-                                    </label>
-                                </div>';
+                                       $content .=' id="'.$filedName.'_'.$key.'" name="'.$filedName.'" value="'.trim($value).'">&nbsp;'.$value.'  &nbsp; 
+                                    ';
         }
 
         return $content;
@@ -372,8 +506,6 @@ $content .='
         $checkBoxArray=explode(",",$param);
         foreach ($checkBoxArray as $key => $value) {
             $content .='
-                                <div class="radio">
-                                    <label for="example-radio1">
                                         <input type="radio" ';
 
                                         if(!empty($datafill)){
@@ -387,9 +519,7 @@ $content .='
                                         }
 
                                         $content .='
-                                        id="'.$filedName.'_'.$key.'" name="'.$filedName.'" value="'.trim($value).'">'.$value.'
-                                    </label>
-                                </div>';
+                                        id="'.$filedName.'_'.$key.'" name="'.$filedName.'" value="'.trim($value).'">&nbsp;'.$value."&nbsp; ";
         }
 
         return $content;
@@ -449,7 +579,28 @@ class ".$modelFileName." extends Model
 namespace App\Http\Controllers;
 
 use App\&#$2$#;'.$modelFileName.';
-use Illuminate\Http\Request;
+use Illuminate\Http\Request;';
+
+foreach($request->field_name as $key=>$field){
+    if(isset($request->field_type[$key]))
+    {
+        if($request->field_type[$key]==5){
+            if($request->field_table[$key]==1){}
+            else{
+                //echo 22; die();
+                //echo $request->field_table[$key];
+                $controllerContent .='
+use App\&#$2$#;'.$request->field_table[$key].';
+                ';
+            }
+
+            //echo 1; die();
+            
+        }
+    }
+}
+
+$controllerContent .='
 
 class '.$modelFileName.'Controller extends Controller
 {
@@ -461,7 +612,10 @@ class '.$modelFileName.'Controller extends Controller
     public function index(){';
 
         $controllerContent .="
-        return view('admin.pages.".$this->modelResourceDirectory($modelFileName).".".$this->modelResourceDirectory($modelFileName)."_list');";
+        &#36;tab=".$modelFileName."::all();";
+
+        $controllerContent .="
+        return view('admin.pages.".$this->modelResourceDirectory($modelFileName).".".$this->modelResourceDirectory($modelFileName)."_list',['dataRow'=>&#36;tab]);";
         
      $controllerContent .='
     }
@@ -473,23 +627,58 @@ class '.$modelFileName.'Controller extends Controller
      */
     public function create(){';
 
-    $controllerContent .="           
-        return view('admin.pages.".$this->modelResourceDirectory($modelFileName).".".$this->modelResourceDirectory($modelFileName)."_create');";
+        $perseDataConcat="";
+        $perseDataConcatParam="";
 
         $contentValidation="";
+
+
         foreach($request->field_name as $key=>$field){
-            if(isset($request->field_validation[$key]))
+
+            //$field=$_POST['field_validation_'.($key+1)];
+
+            if(isset($_POST['field_validation_'.($key+1)]))
             {
-                if($request->field_validation[$key]=="on"){
                     $contentValidation .="
                 '".$this->genarateFieldName($field)."'=>'required',";
+            }
+
+        }
+
+        foreach($request->field_name as $key=>$field){
+            if(isset($request->field_type[$key]))
+            {
+                if($request->field_type[$key]==5){
+                    if($request->field_table[$key]==1){}
+                    else{
+
+                        $controllerContent .="
+        &#36;tab_".$request->field_table[$key]."=".$request->field_table[$key]."::all();";
+                        if(!empty($perseDataConcatParam)){
+                            $perseDataConcatParam .=",'dataRow_".$request->field_table[$key]."'=>&#36;tab_".$request->field_table[$key]."";
+                        }
+                        else
+                        {
+                            $perseDataConcatParam .="'dataRow_".$request->field_table[$key]."'=>&#36;tab_".$request->field_table[$key]."";
+                        }
+                        
+                    }
+                    
                 }
             }
+        }
+
+        if(!empty($perseDataConcatParam)){
+            $perseDataConcat=",[".$perseDataConcatParam."]";
         }
 
 
         $storeSuccess="return redirect('".strtolower($modelFileName)."')->with('status','Added Successfully !');";
         $storeUpdateSuccess="return redirect('".strtolower($modelFileName)."')->with('status','Updated Successfully !');";
+
+    $controllerContent .="           
+        return view('admin.pages.".$this->modelResourceDirectory($modelFileName).".".$this->modelResourceDirectory($modelFileName)."_create'".$perseDataConcat.");";
+
 
     $controllerContent .='
     }
@@ -646,7 +835,13 @@ class '.$modelFileName.'Controller extends Controller
     public function show('.$modelFileName.' &#36;'.strtolower($modelFileName).')
     {
         ';
-        $controllerContent .="return view('admin.pages.".$this->modelResourceDirectory($modelFileName).".".$this->modelResourceDirectory($modelFileName)."_list');";
+
+
+        $controllerContent .="
+        &#36;tab=".$modelFileName."::all();";
+
+
+        $controllerContent .="return view('admin.pages.".$this->modelResourceDirectory($modelFileName).".".$this->modelResourceDirectory($modelFileName)."_list',['dataRow'=>&#36;tab]);";
     $controllerContent .='
     }
 
@@ -659,10 +854,70 @@ class '.$modelFileName.'Controller extends Controller
     public function edit('.$modelFileName.' &#36;'.strtolower($modelFileName).',&#36;id=0)
     {
         &#36;tab='.$modelFileName.'::find(&#36;id); ';
+        $perseDataConcat="";
+        $perseDataConcatParam="";
+        foreach($request->field_name as $key=>$field){
+            if(isset($request->field_type[$key]))
+            {
+                if($request->field_type[$key]==5){
+                    if($request->field_table[$key]==1){}
+                    else{
 
-    $controllerContent .="     return view('admin.pages.".$this->modelResourceDirectory($modelFileName).".".$this->modelResourceDirectory($modelFileName)."_edit',['dataRow'=>&#36;tab,'edit'=>true]); ";
+                        $controllerContent .="
+        &#36;tab_".$request->field_table[$key]."=".$request->field_table[$key]."::all();";
+                        if(!empty($perseDataConcatParam)){
+                            $perseDataConcatParam .=",'dataRow_".$request->field_table[$key]."'=>&#36;tab_".$request->field_table[$key]."";
+                        }
+                        else
+                        {
+                            $perseDataConcatParam .="'dataRow_".$request->field_table[$key]."'=>&#36;tab_".$request->field_table[$key]."";
+                        }
+                        
+                    }
+                    
+                }
+            }
+        }
 
-    $controllerContent .=' }
+        if(!empty($perseDataConcatParam)){
+            $perseDataConcat=",[".$perseDataConcatParam.",'dataRow'=>&#36;tab,'edit'=>true]";
+        }
+        else{
+            $perseDataConcat=",['dataRow'=>&#36;tab,'edit'=>true]";
+        }
+
+    $controllerContent .="     
+        return view('admin.pages.".$this->modelResourceDirectory($modelFileName).".".$this->modelResourceDirectory($modelFileName)."_edit'".$perseDataConcat."); ";
+
+
+
+
+    $contentValidation="";
+    foreach($request->field_name as $key=>$field){
+        if($request->field_type[$key]=="6" || $request->field_type[$key]=="7"){
+            
+        }
+        else
+        {
+
+            if(isset($_POST['field_validation_'.($key+1)]))
+            {
+                    $contentValidation .="
+                '".$this->genarateFieldName($field)."'=>'required',";
+            }
+
+            /*if(isset($request->field_validation[$key]))
+            {
+                if($request->field_validation[$key]=="on"){
+                    $contentValidation .="
+                '".$this->genarateFieldName($field)."'=>'required',";
+                }
+            }*/
+        }
+    }
+
+    $controllerContent .=' 
+    }
 
     /**
      * Update the specified resource in storage.
@@ -741,25 +996,63 @@ class '.$modelFileName.'Controller extends Controller
 
 
         $postCreate="'".$page_route."'";
+        $listRoute="'".$page_route."/list'";
         $res_create_content='';
-        $res_create_content .='@extends("admin.layout.index")
+        $res_create_content .='
+@extends("admin.layout.master")
 @section("title","'.$request->page_name.'")
-@section("page-name","'.$request->page_name.'")
-@section("Module","'.$request->page_name.'")
-@section("Module-Action","Create")
 @section("content")
-                <form action="{{url('.$postCreate.')}}" method="post" enctype="multipart/form-data" class="form-horizontal form-bordered">
-                    {{csrf_field()}}
-                    '.$this->genrateFormField($request).'
-                    
-                    <div class="form-group form-actions">
-                        <div class="col-md-9 col-md-offset-3">
-                            <button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-angle-right"></i> Submit</button>
-                            <button type="reset" class="btn btn-sm btn-warning"><i class="fa fa-repeat"></i> Reset</button>
+<section>
+            <div class="content add-details">
+                <div class="in-content-wrapper">
+                    <div class="box">
+                        <div class="hotel-listing-form">
+                            <form class="text-left">
+                                <div class="form-row">
+                                    <div class="col">
+                                        <div class="details-text">
+                                            <h4>Add New '.$request->page_name.'</h4>
+                                        </div><!-- end details-text -->
+                                    </div><!-- End column -->
+                                    <div class="col-md-6">
+                                        <div class="breadcrumb">
+                                            <div class="breadcrumb-item"><i class="fas fa-angle-right"></i><a href="{{url('.$listRoute.')}}"> '.$request->page_name.' Data</a>
+                                            </div>
+                                            <div class="breadcrumb-item active"><i class="fas fa-angle-right"></i> Create New 
+                                            </div>
+                                        </div><!-- end breadcrumb -->
+                                    </div><!-- End column -->
+                                </div><!-- end row -->
+                            </form>
                         </div>
-                    </div>
-                </form>
+
+
+                        <div class="hotel-listing-form">
+                            <form class="text-center" action="{{url('.$postCreate.')}}" method="post" enctype="multipart/form-data">
+                               
+                               {{csrf_field()}}
+                            '.$this->genrateFormField($request).'
+
+
+
+                                <ul class="list-inline">
+                                    <li class="list-inline-item">
+                                        <button type="submit" class="btn">Submit</button>
+                                    </li>
+                                    <li class="list-inline-item">
+                                        <button type="submit" class="btn">Cancel</button>
+                                    </li>
+                                </ul>
+
+                            </form>
+                        </div><!-- end hotel-listing-form -->
+                    </div><!-- end box -->
+                </div><!-- end in-content-wrapper -->
+            </div><!-- end add-details -->
+        </section>
 @endsection';
+
+
 
         $this->GenarateWithLink($resourceViewPath_create,$res_create_content);
     }
@@ -771,24 +1064,66 @@ class '.$modelFileName.'Controller extends Controller
 
         $postCreate="'".$page_route."/update/'.&#36;dataRow->id";
         $res_create_content='';
-        $res_create_content .='@extends("admin.layout.index")
+        $listRoute="'".$page_route."/list'";
+        $CreateDataRoute="'".$page_route."/create'";
+        $res_create_content .='
+
+@extends("admin.layout.master")
 @section("title","'.$request->page_name.'")
-@section("page-name","'.$request->page_name.'")
-@section("Module","'.$request->page_name.'")
-@section("Module-Action","Edit")
 @section("content")
-                <form action="{{url('.$postCreate.')}}" method="post" enctype="multipart/form-data" class="form-horizontal form-bordered">
-                    {{csrf_field()}}
-                    '.$this->genrateEditFormField($request,1).'
-                    
-                    <div class="form-group form-actions">
-                        <div class="col-md-9 col-md-offset-3">
-                            <button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-angle-right"></i> Submit</button>
-                            <button type="reset" class="btn btn-sm btn-warning"><i class="fa fa-repeat"></i> Reset</button>
+<section>
+            <div class="content add-details">
+                <div class="in-content-wrapper">
+                    <div class="box">
+                        <div class="hotel-listing-form">
+                            <form class="text-left">
+                                <div class="form-row">
+                                    <div class="col">
+                                        <div class="details-text">
+                                            <h4>Add New '.$request->page_name.'</h4>
+                                        </div><!-- end details-text -->
+                                    </div><!-- End column -->
+                                    <div class="col-md-6">
+                                        <div class="breadcrumb">
+                                            <div class="breadcrumb-item"><i class="fas fa-angle-right"></i><a href="{{url('.$listRoute.')}}"> Data List </a>
+                                            </div>
+                                            <div class="breadcrumb-item active"><i class="fas fa-angle-right"></i><a href="{{url('.$CreateDataRoute.')}}">  Create New </a>
+                                            </div>
+                                            <div class="breadcrumb-item"><i class="fas fa-angle-right"></i> Edit / Modify 
+                                            </div>
+                                            
+                                        </div><!-- end breadcrumb -->
+                                    </div><!-- End column -->
+                                </div><!-- end row -->
+                            </form>
                         </div>
-                    </div>
-                </form>
-@endsection';
+
+
+                        <div class="hotel-listing-form">
+                            <form class="text-center" action="{{url('.$postCreate.')}}" method="post" enctype="multipart/form-data" >
+                               
+                               {{csrf_field()}}
+                            '.$this->genrateEditFormField($request,1).'
+
+
+
+                                <ul class="list-inline">
+                                    <li class="list-inline-item">
+                                        <button type="submit" class="btn">Update</button>
+                                    </li>
+                                    <li class="list-inline-item">
+                                        <button type="submit" class="btn">Cancel</button>
+                                    </li>
+                                </ul>
+
+                            </form>
+                        </div><!-- end hotel-listing-form -->
+                    </div><!-- end box -->
+                </div><!-- end in-content-wrapper -->
+            </div><!-- end add-details -->
+        </section>
+@endsection
+';
 
         $this->GenarateWithLink($resourceViewPath_create,$res_create_content);
     }
@@ -800,134 +1135,122 @@ class '.$modelFileName.'Controller extends Controller
 
         $postCreate="'".$page_route."'";
         $res_create_content='';
-        $res_create_content .='@extends("admin.layout.index")
-@section("title","'.$request->page_name.'")
-@section("page-name","'.$request->page_name.'")
-@section("Module","'.$request->page_name.'")
-@section("Module-Action","List")
+        $listRoute="'".$page_route."/list'";
+        $CreateDataRoute="'".$page_route."/create'";
+        $res_create_content .='
+@extends("admin.layout.master")
+@section("title","'.$request->page_name.' Data")
 @section("content")
-                <div class="table-responsive">
-                    <table id="'.strtolower($modelFileName).'_lsit" class="table table-vcenter table-condensed table-bordered">
-                        <thead>
-                            <tr>
-                                <th class="text-center">ID</th>';
+        <section>
+            <div class="content listing-content">
+                <div class="in-content-wrapper">
+                    <div class="box">
+                        <div class="row no-gutters" style="border-bottom: 3px #fff solid;">
+                            <div class="col text-left">
+                                <div class="add-new">
+                                    <a href="{{url('.$CreateDataRoute.')}}">Add New<i class="fas fa-plus"></i></a>
+                                </div><!-- End add-new-->
+                            </div><!-- End column-->
+                            <div class="col">
+                                <div class="heading-messages">
+                                    <h3 class="text-center">'.$request->page_name.' Listing</h3>
+                                </div><!-- End heading-messages -->
+                            </div><!-- End column -->
+                            <div class="col text-right">
+                                <div class="tools-btns">
+                                    <!-- <a href="#"><i class="fas fa-print" data-toggle="tooltip" data-html="true"
+                                            title="Print"></i></a>-->
+                                    <a href="#"><i class="fas fa-file-pdf" data-toggle="tooltip" data-html="true"
+                                            title="Pdf"></i></a>
+                                    <a href="#"><i class="fas fa-file-excel" data-toggle="tooltip" data-html="true"
+                                            title="Excel"></i></a>
+                                </div><!-- End tool-btns-->
+                            </div><!-- End text-right-->
 
-foreach($request->field_name as $key=>$field){       
-$res_create_content .='
-                                <th class="text-center">'.$field.'</th>';    
-}
+                        </div><!-- end row -->
+                        <div class="row no-gutters">
+                            <div class="col">
+                                <table id="example" class="display table-hover table-responsive-xl listing">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">ID</th>';
+                                            $keyPlus=1;
+                                foreach($request->field_name as $key=>$field){       
+                                    $fieldCHeckName="field_data_table_".$keyPlus;
+                                            if(isset($_POST[$fieldCHeckName]))
+                                            {
+                                                $res_create_content .='
+                                            <th class="text-center">'.$field.'</th>';
+                                            }
+                                    
+
+                                            $keyPlus++;
+                                }
                                 
-
-$res_create_content .='
+                                $res_create_content .='
+                                <th class="text-center">Created At</th>
                                 <th class="text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-@endsection
-@section("js")
-';
 
-$edturl="'".strtolower($modelFileName)."/edit'";
-$dlturl="'".strtolower($modelFileName)."/delete'";
+                                        </tr>
+                                    </thead>
+                                    <tbody>';
 
-$res_create_content .='<script>
-    
-    $(document).ready(function(e){
-        var '.strtolower($modelFileName).'EditLink="{{url('.$edturl.')}}";
-        var '.strtolower($modelFileName).'DeleteLink="{{url('.$dlturl.')}}";
+                                        $res_create_content .='
+                                @if(count(&#36;dataRow))
+                                    @foreach(&#36;dataRow as $row)  
+                                        <tr>';
+                                            
 
-        function actionTemplate(id){';
-        $res_create_content .="
-            var actHTml='';
-                
-                actHTml+='<a href=";
-                $res_create_content .='"';
-                $res_create_content .="'+customerEditLink+'/'+id+'";
-                $res_create_content .='" class="btn btn-green mr-1 btn-darken-2"><i class="icon-edit"></i> </a>';
-                $res_create_content .="';";
-$res_create_content .="
-                actHTml+='<a href=";
-$res_create_content .='"';
-$res_create_content .="'+customerDeleteLink+'/'+id+'";
+                                            $res_create_content .='<td class="text-center">{{&#36;row->id}}</td>';
+                                            $keyPlus=1;
+                                            foreach($request->field_name as $key=>$field){ 
+                                                $fieldCHeckName="field_data_table_".$keyPlus;
+                                                if(isset($_POST[$fieldCHeckName]))
+                                                {
+                                                    $res_create_content .='<td class="text-center">{{&#36;row->'.$this->genarateFieldName($field).'}}</td>';
+                                                }
+                                                $keyPlus++;
+                                            }
 
-$res_create_content .='" class="btn btn-green mr-1 btn-darken-3"><i class="icon-trash"></i> </a>';
-$res_create_content .="';";
-$res_create_content .="
-                return actHTml;
-        }
+                                            $edturl="'".strtolower($modelFileName)."/edit/'.&#36;row->id";
+                                            $dlturl="'".strtolower($modelFileName)."/delete/'.&#36;row->id";
+                                            $res_create_content .='
+                                            <td>{{formatDate(&#36;row->created_at)}}</td>
+                                            <td>
+                                                <a href="{{url('.$edturl.')}}"><i class="fas fa-edit"></i></a>
+                                                <a href="{{url('.$dlturl.')}}"><i class="fas fa-trash-alt"></i></a>
+                                            </td>
+                                        ';
 
-        function replaceNull(valH){";
-            $res_create_content .='
-            var returnHt="";
-
-            if(valH !== null && valH !== "") {
-                    returnHt=valH;
-                
-                
-            }
-
-            return returnHt;
-        }
-
-        $("#post_list").dataTable({
-            "bProcessing": true,
-            "serverSide": true,
-            "ajax":{
-
-                url :"{{url(';
-                    $res_create_content .="'".strtolower($modelFileName)."/datatable/ajax'";
-                    $res_create_content .=')}}",
-                headers: {';
-                $res_create_content .="
-                    'X-CSRF-TOKEN':'{{csrf_token()}}',
-
-                },";
-                $res_create_content .='type: "POST",
-                complete:function(data){
-                    console.log(data.responseJSON);
-                    var totalData=data.responseJSON;
-                    console.log(totalData.data);';
-                    $res_create_content .="
-                    var strHTML='';
-                    $.each(totalData.data,function(key,row){
-                        console.log(row);";
-$res_create_content .="
-                        strHTML+='<tr>';";
-
-foreach($request->field_name as $key=>$field){       
-$res_create_content .="
-                        strHTML+='      <td>'+replaceNull(row.".$this->genarateFieldName($field).")+'</td>';";    
-}
-
-$res_create_content .="
-                        strHTML+='      <td>'+actionTemplate(row.id)+'</td>';
-                        strHTML+='</tr>';";
-$res_create_content .='    
-                    });
-
-                    $("tbody").html(strHTML);
-
-                    $("#'.strtolower($modelFileName).'_lsit").DataTable();
-                },
-                initComplete: function(settings, json) {
-                    alert("DataTables has finished its initialisation.");
-                  },
-                error: function(){
-                  $("#'.strtolower($modelFileName).'_lsit_processing").css("display","none");
-                }
-            }
-        });
-    });
-
-
-    </script>
-@include("admin.extra.datatable")
-';
+                $res_create_content .='
+                                        </tr>
+                                    @endforeach
+                                @endif
+                                        ';  
+                                        
+                            $res_create_content .='
+                                    </tbody>
+                                </table>
+                            </div><!-- end column -->
+                        </div><!-- end row -->
+                    </div><!-- end box -->
+                </div><!-- end in-content-wrapper -->
+            </div><!-- end listing-content -->
+        </section>
+@endsection';
 
 $res_create_content .='
+@section("css")
+    @include("admin.extra.lib.datatable.css")
+@endsection
+
+@section("js")
+    @include("admin.extra.lib.datatable.js")
 @endsection';
+//dataRow
+
+
+
 
         $this->GenarateWithLink($resourceViewPath_create,$res_create_content);
     }
@@ -993,57 +1316,80 @@ $migContent .="
     }
 }
 ";
-        
+        \DB::statement("INSERT INTO ecom_page_names (name,db_table,route_link) values ('".$migFileClassName."','".$getMigrationTableFile."','".$request->page_route."')");
         $sqlCheckMax=\DB::table('migrations')->orderBy('batch','DESC')->first();
         \DB::statement("INSERT INTO ecom_migrations (migration,batch) values ('".$slashes."','".($sqlCheckMax->batch+1)."')");
+
+        $laraTableDB="CREATE TABLE `ecom_".$getMigrationTableFile."` (
+            `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,";
+        foreach($request->field_name as $key=>$field){       
+                $laraTableDB .="
+                `".$this->genarateFieldName($field)."` VARCHAR(191) NULL  DEFAULT NULL COLLATE 'utf8mb4_unicode_ci',";    
+        }
+            
+        $laraTableDB.="    
+            `store_id` INT(11) NULL DEFAULT NULL,
+            `created_by` INT(11) NULL DEFAULT NULL,
+            `updated_by` INT(11) NULL DEFAULT NULL,
+            `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+            `created_at` TIMESTAMP NULL DEFAULT NULL,
+            `updated_at` TIMESTAMP NULL DEFAULT NULL,
+            PRIMARY KEY (`id`)
+        )
+        COLLATE='utf8mb4_unicode_ci'
+        ENGINE=InnoDB
+        ;
+        ";
+
+        \DB::statement($laraTableDB);
 
         $this->GenarateWithLink($finalMigrationFIle,$migContent);
     }
 
     public function crudgenarate(Request $request)
     {
+
+        //dd($request);
+
         $logPath = __DIR__;
 
 
         //Route Genaration Start
-        //$this->CoreRouteResource($request->page_route);
+        $this->CoreRouteResource($request->page_route);
         //Route Genaration End
 
         //Model Genaration Start
-        //$modelPath = __DIR__."/../../";
-
-
-        //$modelFileName=$this->genarateModelName($request->page_name);
-        //$getMigrationTable=$this->getPluralPrase(strtolower($modelFileName),strlen($modelFileName));
-        //$this->CoreModelResource($modelFileName,$getMigrationTable,$request);
+        $modelFileName=$this->genarateModelName($request->page_name);
+        $getMigrationTable=$this->getPluralPrase(strtolower($modelFileName),strlen($modelFileName));
+        $this->CoreModelResource($modelFileName,$getMigrationTable,$request);
         //Model Genaration End
 
 
         //Controller Genaration Start
-        //$controllerPath = __DIR__."/";
-        //$controllerPathFile = __DIR__."/".ucfirst($request->page_route)."Controller.php";
-        //$this->CoreControllerResource($modelFileName,$controllerPathFile,$request);
+        $controllerPath = __DIR__."/";
+        $controllerPathFile = __DIR__."/".ucfirst($request->page_route)."Controller.php";
+        $this->CoreControllerResource($modelFileName,$controllerPathFile,$request);
         //Controller Genaration End
 
         //Resource Directory Genaration Start
-        //$resourcePath = __DIR__."/../../../resources/views/admin/pages/".$this->modelResourceDirectory($modelFileName);
-        //if($this->createDirectoryWithLocation($resourcePath))
+        $resourcePath = __DIR__."/../../../resources/views/admin/pages/".$this->modelResourceDirectory($modelFileName);
+        if($this->createDirectoryWithLocation($resourcePath))
         //Resource Directory Genaration End
 
 
         //Resource Create View Genaration Start
-        //$this->CoreCreateViewFileResource($modelFileName,$request->page_route,$request);
-        //$this->CoreEditViewFileResource($modelFileName,$request->page_route,$request);
-        //$this->CoreListViewFileResource($modelFileName,$request->page_route,$request);
+        $this->CoreCreateViewFileResource($modelFileName,$request->page_route,$request);
+        $this->CoreEditViewFileResource($modelFileName,$request->page_route,$request);
+        $this->CoreListViewFileResource($modelFileName,$request->page_route,$request);
         //Resource Create View Genaration End
         
         //Migration Create Genaration Start
         $this->CoreMigrationFileResource($request);
         //Migration Create Genaration End
 
-      
+        //dd($request);
         //echo $routePath; die();
-        dd($request);
+        return redirect(url('crud'))->with('status',$request->page_name.' created successfully.');
     }
 
     

@@ -7,7 +7,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <![endif]-->
 <meta http-equiv="x-ua-compatible" content="ie=edge">
-<title>  @yield('title')  | Famous Electronics eCommerce Website Template</title>
+<title>  @yield('title')  | Famous Electronics eCommerce</title>
 <meta name="google" content="clean template, electronics Store, html5, electronics template, makeup store, modern, multipurpose store, electronics shop, commerce, ecommerce, electronics, electronics theme, megamenu, modern, retail, store"/>
 
 <!-- Mobile specific metas  -->

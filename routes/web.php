@@ -18,6 +18,9 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/dashboard', 'HomeController@dashboard')->name('dashboard');
+Route::get('/create', 'HomeController@create')->name('create');
+Route::get('/table', 'HomeController@table')->name('table');
 Route::get('/blank', 'HomeController@blank')->name('blank');
 Route::get('/form', 'HomeController@form')->name('form');
 Route::get('/addmore', 'HomeController@addmore')->name('addmore');
@@ -56,3 +59,25 @@ Route::get('/orders_list', function () {
 Route::get('/register', function () {
     return view('site.pages.register');
 });
+
+Route::get('/test', function () {
+    echo md5(rand())."<br>"; 
+    echo md5(rand())."<br>"; 
+    echo md5(rand())."<br>"; 
+    echo md5(rand())."<br>"; 
+    echo time()."<br>"; 
+    echo microtime()."<br>"; 
+});
+
+
+//======================== Testpage Route Start ===============================//
+Route::get('/testpage/list','TestpageController@show');
+Route::get('/testpage/create','TestpageController@create');
+Route::get('/testpage/edit/{id}','TestpageController@edit');
+Route::get('/testpage/delete/{id}','TestpageController@destroy');
+Route::get('/testpage','TestpageController@index');
+Route::post('/testpage','TestpageController@store');
+Route::post('/testpage/ajax','TestpageController@ajaxSave');
+Route::post('/testpage/datatable/ajax','TestpageController@datatable');
+Route::post('/testpage/update/{id}','TestpageController@update');
+//======================== Testpage Route End ===============================//

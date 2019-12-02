@@ -2,19 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\TestPage;
+use App\Cateh;
 use Illuminate\Http\Request;
 
-class TestPageController extends Controller
+class CatehController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
+
+    private $moduleName="Assign User Role ";
+    private $sdc;
+    public function __construct(){ $this->sdc = new CoreCustomController(); }
+    
     public function index(){
-        $tab=TestPage::all();
-        return view('admin.pages.testpage.testpage_list',['dataRow'=>$tab]);
+        $tab=Cateh::all();
+        return view('admin.pages.cateh.cateh_list',['dataRow'=>$tab]);
     }
 
     /**
@@ -23,7 +28,7 @@ class TestPageController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create(){           
-        return view('admin.pages.testpage.testpage_create');
+        return view('admin.pages.cateh.cateh_create');
     }
 
     /**
@@ -40,13 +45,12 @@ class TestPageController extends Controller
         ]);
 
         
-        $tab=new TestPage();
+        $tab=new Cateh();
         
         $tab->name=$request->name;
-        $tab->address=$request->address;
         $tab->save();
 
-        return redirect('testpage')->with('status','Added Successfully !');
+        return redirect('cateh')->with('status','Added Successfully !');
 
     }
 
@@ -57,10 +61,9 @@ class TestPageController extends Controller
                 'name'=>'required',
         ]);
 
-        $tab=new TestPage();
+        $tab=new Cateh();
         
         $tab->name=$request->name;
-        $tab->address=$request->address;
         $tab->save();
 
         echo json_encode(array("status"=>"success","msg"=>"Added Successfully."));
@@ -70,7 +73,7 @@ class TestPageController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\TestPage  $testpage
+     * @param  \App\Cateh  $cateh
      * @return \Illuminate\Http\Response
      */
 
@@ -81,7 +84,6 @@ class TestPageController extends Controller
                      ->when($search, function ($query) use ($search) {
                         $query->where('id','LIKE','%'.$search.'%');
                             $query->orWhere('name','LIKE','%'.$search.'%');
-                            $query->orWhere('address','LIKE','%'.$search.'%');
                             $query->orWhere('created_at','LIKE','%'.$search.'%');
 
                         return $query;
@@ -98,7 +100,6 @@ class TestPageController extends Controller
                      ->when($search, function ($query) use ($search) {
                         $query->where('id','LIKE','%'.$search.'%');
                             $query->orWhere('name','LIKE','%'.$search.'%');
-                            $query->orWhere('address','LIKE','%'.$search.'%');
                             $query->orWhere('created_at','LIKE','%'.$search.'%');
 
                         return $query;
@@ -131,56 +132,125 @@ class TestPageController extends Controller
     }
 
     
-    public function show(TestPage $testpage)
+    public function CatehQuery($request)
+    {
+        $Cateh_data=Cateh::orderBy('id','DESC')->get();
+
+        return $Cateh_data;
+    }
+    
+   
+
+    public function ExportExcel(Request $request) 
+    {
+         $dataDateTimeIns=formatDateTime(date('d-M-Y H:i:s a'));
+        $data=array();
+        $array_column=array(
+                                'ID','Name','Created Date');
+        array_push($data, $array_column);
+        $inv=$this->CatehQuery($request);
+        foreach($inv as $voi):
+            $inv_arry=array(
+                                $voi->id,$voi->name,formatDate($voi->created_at));
+            array_push($data, $inv_arry);
+        endforeach;
+
+        $excelArray=array(
+            'report_name'=>'Cateh Report',
+            'report_title'=>'Cateh Report',
+            'report_description'=>'Report Genarated : '.$dataDateTimeIns,
+            'data'=>$data
+        );
+
+        $this->sdc->ExcelLayout($excelArray);
+        
+    }
+
+    public function ExportPDF(Request $request)
+    {
+
+        $html="<table class='table table-bordered' style='width:100%;'>
+                <thead>
+                <tr>
+                <th class='text-center' style='font-size:12px;'>ID</th>
+                            <th class='text-center' style='font-size:12px;' >Name</th>
+                        
+                <th class='text-center' style='font-size:12px;'>Created Date</th>
+                </tr>
+                </thead>
+                <tbody>";
+
+                    $inv=$this->profitQuery($request);
+                    foreach($inv as $voi):
+                        $html .="<tr>
+                        <td style='font-size:12px;' class='text-center'>".$voi->id."</td>
+                        <td style='font-size:12px;' class='text-center'>".$voi->name."</td>
+                        <td style='font-size:12px;' class='text-right'>".formatDate($voi->created_at)."</td>
+                        </tr>";
+
+                    endforeach;
+
+
+                $html .="</tbody>
+                
+                </table>
+
+
+                ";
+
+                $this->sdc->PDFLayout('Cateh Report',$html);
+
+
+    }
+    public function show(Cateh $cateh)
     {
         
-        $tab=TestPage::all();return view('admin.pages.testpage.testpage_list',['dataRow'=>$tab]);
+        $tab=Cateh::all();return view('admin.pages.cateh.cateh_list',['dataRow'=>$tab]);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\TestPage  $testpage
+     * @param  \App\Cateh  $cateh
      * @return \Illuminate\Http\Response
      */
-    public function edit(TestPage $testpage,$id=0)
+    public function edit(Cateh $cateh,$id=0)
     {
-        $tab=TestPage::find($id);      
-        return view('admin.pages.testpage.testpage_edit',['dataRow'=>$tab,'edit'=>true]);  
+        $tab=Cateh::find($id);      
+        return view('admin.pages.cateh.cateh_edit',['dataRow'=>$tab,'edit'=>true]);  
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\TestPage  $testpage
+     * @param  \App\Cateh  $cateh
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, TestPage $testpage,$id=0)
+    public function update(Request $request, Cateh $cateh,$id=0)
     {
         $this->validate($request,[
                 
                 'name'=>'required',
         ]);
         
-        $tab=TestPage::find($id);
+        $tab=Cateh::find($id);
         
         $tab->name=$request->name;
-        $tab->address=$request->address;
         $tab->save();
 
-        return redirect('testpage')->with('status','Updated Successfully !');
+        return redirect('cateh')->with('status','Updated Successfully !');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\TestPage  $testpage
+     * @param  \App\Cateh  $cateh
      * @return \Illuminate\Http\Response
      */
-    public function destroy(TestPage $testpage,$id=0)
+    public function destroy(Cateh $cateh,$id=0)
     {
-        $tab=TestPage::find($id);
+        $tab=Cateh::find($id);
         $tab->delete();
-        return redirect('testpage')->with('status','Deleted Successfully !');}
+        return redirect('cateh')->with('status','Deleted Successfully !');}
 }

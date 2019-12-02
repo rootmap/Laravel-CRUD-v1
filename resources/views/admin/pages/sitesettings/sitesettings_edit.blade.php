@@ -1,7 +1,7 @@
 
 
 @extends("admin.layout.master")
-@section("title","Test Page")
+@section("title","Site Settings")
 @section("content")
 <section>
             <div class="content add-details">
@@ -12,16 +12,16 @@
                                 <div class="form-row">
                                     <div class="col">
                                         <div class="details-text">
-                                            <h4>Add New Test Page</h4>
+                                            <h4>Add New Site Settings</h4>
                                         </div><!-- end details-text -->
                                     </div><!-- End column -->
                                     <div class="col-md-6">
                                         <div class="breadcrumb">
-                                            <div class="breadcrumb-item"><i class="fas fa-angle-right"></i><a href="{{url('testpage/list')}}"> Test Page Data</a>
+                                            <div class="breadcrumb-item"><i class="fas fa-angle-right"></i><a href="{{url('sitesettings/list')}}"> Data List </a>
                                             </div>
-                                            <div class="breadcrumb-item active"><i class="fas fa-angle-right"></i><a href="{{url('testpage/create')}}">  Create New </a>
+                                            <div class="breadcrumb-item active"><i class="fas fa-angle-right"></i><a href="{{url('sitesettings/create')}}">  Create New </a>
                                             </div>
-                                            <div class="breadcrumb-item"><i class="fas fa-angle-right"></i> Edit Test Page Data 
+                                            <div class="breadcrumb-item"><i class="fas fa-angle-right"></i> Edit / Modify 
                                             </div>
                                             
                                         </div><!-- end breadcrumb -->
@@ -32,38 +32,42 @@
 
 
                         <div class="hotel-listing-form">
-                            <form class="text-center" action="{{url('testpage/update/'.$dataRow->id)}}" method="post" enctype="multipart/form-data" >
+                            <form class="text-center" action="{{url('sitesettings/update/'.$dataRow->id)}}" method="post" enctype="multipart/form-data" >
                                
                                {{csrf_field()}}
                             
                         <div class="form-row">
                             <div class="col-md">
                                 <div class="form-group">
-                                    <label for="inputGroupSelect07" class="" for="name">Name:</label>
+                                    <label for="inputGroupSelect07" class="" for="sitename">Site Name:</label>
                                     <input type="text" 
                                      
                                 <?php 
-                                if(isset($dataRow->name)){
+                                if(isset($dataRow->sitename)){
                                     ?>
-                                    value="{{$dataRow->name}}" 
+                                    value="{{$dataRow->sitename}}" 
                                     <?php 
                                 }
                                 ?>
-                                 id="name" name="name" class="form-control" placeholder="Enter Name">
+                                 id="sitename" name="sitename" class="form-control" placeholder="Enter Site Name">
                                 </div><!-- end form-group -->
                             </div><!-- end column -->
                         </div><!-- end form-row -->
-                        <div class="form-group">
-                                <h4>Address</h4>
-                                <textarea class="form-control textarea text-left p-3 h-100"
-                                        id="address" name="address" rows="5" placeholder="Enter Address"><?php 
-                                if(isset($dataRow->address)){
-                                    
-                                    echo $dataRow->address;
-                                    
-                                }
-                                ?></textarea>
-                        </div><!-- end form-group -->
+                        <div class="form-row">
+                            <div class="col-md">
+                                <div class="form-group">
+
+                                    <label for="inputGroupSelect07" class="" for="sitelogo">Site logo:</label>
+                                <input type="file" id="sitelogo" name="sitelogo">
+                                <input type="hidden" value="{{$dataRow->sitelogo}}" name="ex_sitelogo" />
+                                @if(isset($dataRow->sitelogo))
+                                    @if(!empty($dataRow->sitelogo))
+                                        <img src="{{url('upload/sitesettings/'.$dataRow->sitelogo)}}" width="150">
+                                    @endif
+                                @endif
+                            </div><!-- end form-group -->
+                            </div><!-- end column -->
+                        </div><!-- end form-row -->
 
 
 

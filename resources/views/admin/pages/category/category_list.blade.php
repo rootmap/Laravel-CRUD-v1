@@ -1,6 +1,6 @@
 
 @extends("admin.layout.master")
-@section("title","Test Page Data")
+@section("title","Category Data")
 @section("content")
         <section>
             <div class="content listing-content">
@@ -9,17 +9,17 @@
                         <div class="row no-gutters" style="border-bottom: 3px #fff solid;">
                             <div class="col text-left">
                                 <div class="add-new">
-                                    <a href="{{url('testpage/create')}}">Add New<i class="fas fa-plus"></i></a>
+                                    <a href="{{url('category/create')}}">Add New<i class="fas fa-plus"></i></a>
                                 </div><!-- End add-new-->
                             </div><!-- End column-->
                             <div class="col">
                                 <div class="heading-messages">
-                                    <h3 class="text-center">Test Page Listing</h3>
+                                    <h3 class="text-center">Category Listing</h3>
                                 </div><!-- End heading-messages -->
                             </div><!-- End column -->
                             <div class="col text-right">
                                 <div class="tools-btns">
-                                    <!--<a href="#"><i class="fas fa-print" data-toggle="tooltip" data-html="true"
+                                    <!-- <a href="#"><i class="fas fa-print" data-toggle="tooltip" data-html="true"
                                             title="Print"></i></a>-->
                                     <a href="#"><i class="fas fa-file-pdf" data-toggle="tooltip" data-html="true"
                                             title="Pdf"></i></a>
@@ -47,8 +47,8 @@
                                         <tr><td class="text-center">{{$row->id}}</td><td class="text-center">{{$row->name}}</td>
                                             <td>{{formatDate($row->created_at)}}</td>
                                             <td>
-                                                <a href="{{url('testpage/edit/'.$row->id)}}"><i class="fas fa-edit"></i></a>
-                                                <a href="{{url('testpage/delete/'.$row->id)}}"><i class="fas fa-trash-alt"></i></a>
+                                                <a href="{{url('category/edit/'.$row->id)}}"><i class="fas fa-edit"></i></a>
+                                                <a href="{{url('category/delete/'.$row->id)}}"><i class="fas fa-trash-alt"></i></a>
                                             </td>
                                         
                                         </tr>
@@ -65,9 +65,9 @@
         </section>
 @endsection
 @section("css")
-    @include('admin.extra.lib.datatable.css')
+    @include("admin.extra.lib.datatable.css")
 @endsection
 
 @section("js")
-    @include('admin.extra.lib.datatable.js')
+    @include("admin.extra.lib.datatable.js")
 @endsection

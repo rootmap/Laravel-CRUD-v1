@@ -32,14 +32,24 @@
                                 <div class="form-row">
                                     <div class="col-md ml-3">
                                         <div class="form-group">
-                                            <label for="inputGroupSelect07" class="">Page/Feature Name:</label>
+                                            <label for="inputGroupSelect07" class="">Module:</label>
                                             <input type="text" name="page_name" class="form-control" required id="page_name">
                                         </div><!-- end form-group -->
                                     </div><!-- end column -->
                                     <div class="col-md mr-4">
                                         <div class="form-group">
-                                            <label for="inputGroupSelect07" class="">Page Route:</label>
+                                            <label for="inputGroupSelect07" class="">Route:</label>
                                             <input type="text" readonly="readonly" class="form-control" name="page_route" required id="page_route">
+                                        </div><!-- end form-group -->
+                                    </div><!-- end column -->                                    
+                                    <div class="col-md mr-4">
+                                        <div class="form-group">
+                                            <label for="inputGroupSelect07" class="">Type:</label>
+                                            <select name="page_type" class="form-control">
+                                                <option value="CRUD">CRUD</option>
+                                                <option value="Single">Single</option>
+                                                <option value="Report">Report</option>
+                                            </select>
                                         </div><!-- end form-group -->
                                     </div><!-- end column -->
                                 </div><!-- end form-row -->
@@ -141,6 +151,7 @@
                 $(this).attr("id","tr"+r);
                 $(this).find("td:first").html(r);
                 $(this).find("td:eq(2)").find("input").attr("name","field_validation_"+r);
+                $(this).find("td:eq(3)").find("input").attr("name","field_data_table_"+r);
                 r++;
             });
         }

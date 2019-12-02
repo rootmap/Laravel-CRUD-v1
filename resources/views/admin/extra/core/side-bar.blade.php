@@ -1,6 +1,6 @@
 		<div class="sidebar-left">
 			<div class="sidebar-topbar text-center">
-				<i class="fa fa-plane"></i><span class="text">Star Travels</span>
+				<i class="fa fa-plane"></i><span class="text">Core CMS</span>
 			</div> <!-- End sidebar-topbar -->
 			<!-- End sidebar-topbar -->
 

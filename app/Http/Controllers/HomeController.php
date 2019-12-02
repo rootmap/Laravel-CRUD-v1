@@ -535,6 +535,8 @@ $content .='
         $routeContent .="\nRoute::get('/".$page_route."/edit/{id}','".ucfirst($page_route)."Controller@edit');";
         $routeContent .="\nRoute::get('/".$page_route."/delete/{id}','".ucfirst($page_route)."Controller@destroy');";
         $routeContent .="\nRoute::get('/".$page_route."','".ucfirst($page_route)."Controller@index');";
+        $routeContent .="\nRoute::get('/".$page_route."/export/excel','".ucfirst($page_route)."Controller@ExportExcel');";
+        $routeContent .="\nRoute::get('/".$page_route."/export/pdf','".ucfirst($page_route)."Controller@ExportPDF');";
 
         $routeContent .="\nRoute::post('/".$page_route."','".ucfirst($page_route)."Controller@store');";
         $routeContent .="\nRoute::post('/".$page_route."/ajax','".ucfirst($page_route)."Controller@ajaxSave');";
@@ -609,13 +611,80 @@ class '.$modelFileName.'Controller extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    private &#36;moduleName="Assign User Role ";
+    private &#36;sdc;
+    public function __construct(){ &#36;this->sdc = new CoreCustomController(); }
+    
     public function index(){';
 
-        $controllerContent .="
-        &#36;tab=".$modelFileName."::all();";
+        
+
+        if($request->page_type=="Single"){
+
+            $createPageRoute="'".$page_route."/create'";
+
+            $controllerContent .="
+        &#36;tabCount=".$modelFileName."::count();
+        if(&#36;tabCount>0)
+        {
+            return redirect(url('".$createPageRoute."'));
+        }else{
+
+            &#36;tab=".$modelFileName."::orderBy('id','DESC')->first(); ";
+
+            $perseDataConcat="";
+        $perseDataConcatParam="";
+        foreach($request->field_name as $key=>$field){
+            if(isset($request->field_type[$key]))
+            {
+                if($request->field_type[$key]==5){
+                    if($request->field_table[$key]==1){}
+                    else{
+
+                        $controllerContent .="
+        &#36;tab_".$request->field_table[$key]."=".$request->field_table[$key]."::all();";
+                        if(!empty($perseDataConcatParam)){
+                            $perseDataConcatParam .=",'dataRow_".$request->field_table[$key]."'=>&#36;tab_".$request->field_table[$key]."";
+                        }
+                        else
+                        {
+                            $perseDataConcatParam .="'dataRow_".$request->field_table[$key]."'=>&#36;tab_".$request->field_table[$key]."";
+                        }
+                        
+                    }
+                    
+                }
+            }
+        }
+
+        if(!empty($perseDataConcatParam)){
+            $perseDataConcat=",[".$perseDataConcatParam.",'dataRow'=>&#36;tab,'edit'=>true]";
+        }
+        else{
+            $perseDataConcat=",['dataRow'=>&#36;tab,'edit'=>true]";
+        }
+
+    $controllerContent .="     
+        return view('admin.pages.".$this->modelResourceDirectory($modelFileName).".".$this->modelResourceDirectory($modelFileName)."_edit'".$perseDataConcat."); ";
 
         $controllerContent .="
+        }
+        ";
+
+        
+
+
+        }else{
+            $controllerContent .="
+        &#36;tab=".$modelFileName."::all();";
+
+            $controllerContent .="
         return view('admin.pages.".$this->modelResourceDirectory($modelFileName).".".$this->modelResourceDirectory($modelFileName)."_list',['dataRow'=>&#36;tab]);";
+        }
+
+
+        
         
      $controllerContent .='
     }
@@ -830,6 +899,114 @@ class '.$modelFileName.'Controller extends Controller
     }
 
     ";
+
+
+    $controllerContent .="
+    public function ".$modelFileName."Query(&#36;request)
+    {
+        &#36;".$modelFileName."_data=".$modelFileName."::orderBy('id','DESC')->get();
+
+        return &#36;".$modelFileName."_data;
+    }
+    ";
+
+    $dataDateTimeIns="'d-M-Y H:i:s a'";
+
+    $controllerContent .="
+   
+
+    public function ExportExcel(Request &#36;request) 
+    {
+         &#36;dataDateTimeIns=formatDateTime(date(".$dataDateTimeIns."));
+        &#36;data=array();
+        &#36;array_column=array(
+                                'ID',";
+
+                                foreach($request->field_name as $key=>$field){       
+                                        $controllerContent .="'".$field."',";
+                                }
+
+                                $controllerContent .="'Created Date');
+        array_push(&#36;data, &#36;array_column);
+        &#36;inv=&#36;this->".$modelFileName."Query(&#36;request);
+        foreach(&#36;inv as &#36;voi):
+            &#36;inv_arry=array(
+                                &#36;voi->id,";
+                                foreach($request->field_name as $key=>$field){ 
+                                    $controllerContent .="&#36;voi->".$this->genarateFieldName($field).",";
+                                }
+
+                                
+
+                                $controllerContent .="formatDate(&#36;voi->created_at));
+            array_push(&#36;data, &#36;inv_arry);
+        endforeach;
+
+        &#36;excelArray=array(
+            'report_name'=>'".$request->page_name." Report',
+            'report_title'=>'".$request->page_name." Report',
+            'report_description'=>'Report Genarated : '.&#36;dataDateTimeIns,
+            'data'=>&#36;data
+        );
+
+        &#36;this->sdc->ExcelLayout(&#36;excelArray);
+        
+    }
+
+    public function ExportPDF(Request &#36;request)
+    {";
+
+    $dataPullComma='"';
+
+    $controllerContent .="
+
+        &#36;html=".$dataPullComma."<table class='table table-bordered' style='width:100%;'>
+                <thead>
+                <tr>
+                <th class='text-center' style='font-size:12px;'>ID</th>";
+
+                foreach($request->field_name as $key=>$field){       
+                        $controllerContent .="
+                            <th class='text-center' style='font-size:12px;' >".$field."</th>
+                        ";
+                }
+
+                $controllerContent .="
+                <th class='text-center' style='font-size:12px;'>Created Date</th>
+                </tr>
+                </thead>
+                <tbody>".$dataPullComma.";
+
+                    &#36;inv=&#36;this->".$modelFileName."Query(&#36;request);
+                    foreach(&#36;inv as &#36;voi):
+                        &#36;html .=".$dataPullComma."<tr>
+                        <td style='font-size:12px;' class='text-center'>".$dataPullComma.".&#36;voi->id.".$dataPullComma."</td>";
+
+                        foreach($request->field_name as $key=>$field){ 
+                            $controllerContent .="
+                        <td style='font-size:12px;' class='text-center'>".$dataPullComma.".&#36;voi->".$this->genarateFieldName($field).".".$dataPullComma."</td>";
+                        }
+                        $controllerContent .="
+                        <td style='font-size:12px;' class='text-right'>".$dataPullComma.".formatDate(&#36;voi->created_at).".$dataPullComma."</td>
+                        </tr>".$dataPullComma.";
+
+                    endforeach;
+
+
+                &#36;html .=".$dataPullComma."</tbody>
+                
+                </table>
+
+
+                ".$dataPullComma.";
+
+                &#36;this->sdc->PDFLayout('".$request->page_name." Report',&#36;html);
+
+
+    }";
+
+
+
 
     $controllerContent .='
     public function show('.$modelFileName.' &#36;'.strtolower($modelFileName).')
@@ -1137,6 +1314,10 @@ class '.$modelFileName.'Controller extends Controller
         $res_create_content='';
         $listRoute="'".$page_route."/list'";
         $CreateDataRoute="'".$page_route."/create'";
+        $excelDataRoute="'".$page_route."/export/excel'";
+        $pdfDataRoute="'".$page_route."/export/pdf'";
+
+
         $res_create_content .='
 @extends("admin.layout.master")
 @section("title","'.$request->page_name.' Data")
@@ -1160,9 +1341,9 @@ class '.$modelFileName.'Controller extends Controller
                                 <div class="tools-btns">
                                     <!-- <a href="#"><i class="fas fa-print" data-toggle="tooltip" data-html="true"
                                             title="Print"></i></a>-->
-                                    <a href="#"><i class="fas fa-file-pdf" data-toggle="tooltip" data-html="true"
+                                    <a href="{{url('.$pdfDataRoute.')}}"><i class="fas fa-file-pdf" data-toggle="tooltip" data-html="true"
                                             title="Pdf"></i></a>
-                                    <a href="#"><i class="fas fa-file-excel" data-toggle="tooltip" data-html="true"
+                                    <a href="{{url('.$excelDataRoute.')}}"><i class="fas fa-file-excel" data-toggle="tooltip" data-html="true"
                                             title="Excel"></i></a>
                                 </div><!-- End tool-btns-->
                             </div><!-- End text-right-->
@@ -1355,13 +1536,13 @@ $migContent .="
 
 
         //Route Genaration Start
-        $this->CoreRouteResource($request->page_route);
+        //$this->CoreRouteResource($request->page_route);
         //Route Genaration End
 
         //Model Genaration Start
         $modelFileName=$this->genarateModelName($request->page_name);
-        $getMigrationTable=$this->getPluralPrase(strtolower($modelFileName),strlen($modelFileName));
-        $this->CoreModelResource($modelFileName,$getMigrationTable,$request);
+        //$getMigrationTable=$this->getPluralPrase(strtolower($modelFileName),strlen($modelFileName));
+        //$this->CoreModelResource($modelFileName,$getMigrationTable,$request);
         //Model Genaration End
 
 
@@ -1372,24 +1553,24 @@ $migContent .="
         //Controller Genaration End
 
         //Resource Directory Genaration Start
-        $resourcePath = __DIR__."/../../../resources/views/admin/pages/".$this->modelResourceDirectory($modelFileName);
-        if($this->createDirectoryWithLocation($resourcePath))
+        //$resourcePath = __DIR__."/../../../resources/views/admin/pages/".$this->modelResourceDirectory($modelFileName);
+        //if($this->createDirectoryWithLocation($resourcePath))
         //Resource Directory Genaration End
 
 
         //Resource Create View Genaration Start
-        $this->CoreCreateViewFileResource($modelFileName,$request->page_route,$request);
-        $this->CoreEditViewFileResource($modelFileName,$request->page_route,$request);
-        $this->CoreListViewFileResource($modelFileName,$request->page_route,$request);
+        //$this->CoreCreateViewFileResource($modelFileName,$request->page_route,$request);
+        //$this->CoreEditViewFileResource($modelFileName,$request->page_route,$request);
+        //$this->CoreListViewFileResource($modelFileName,$request->page_route,$request);
         //Resource Create View Genaration End
         
         //Migration Create Genaration Start
-        $this->CoreMigrationFileResource($request);
+        //$this->CoreMigrationFileResource($request);
         //Migration Create Genaration End
 
-        //dd($request);
+        dd($request);
         //echo $routePath; die();
-        return redirect(url('crud'))->with('status',$request->page_name.' created successfully.');
+        //return redirect(url($request->page_route))->with('status',$request->page_name.' created successfully.');
     }
 
     

@@ -1,6 +1,6 @@
 
 @extends("admin.layout.master")
-@section("title","Test Page")
+@section("title","Test Phase")
 @section("content")
 <section>
             <div class="content add-details">
@@ -11,12 +11,12 @@
                                 <div class="form-row">
                                     <div class="col">
                                         <div class="details-text">
-                                            <h4>Add New Test Page</h4>
+                                            <h4>Add New Test Phase</h4>
                                         </div><!-- end details-text -->
                                     </div><!-- End column -->
                                     <div class="col-md-6">
                                         <div class="breadcrumb">
-                                            <div class="breadcrumb-item"><i class="fas fa-angle-right"></i><a href="{{url('testpage/list')}}"> Test Page Data</a>
+                                            <div class="breadcrumb-item"><i class="fas fa-angle-right"></i><a href="{{url('testphase/list')}}"> Test Phase Data</a>
                                             </div>
                                             <div class="breadcrumb-item active"><i class="fas fa-angle-right"></i> Create New 
                                             </div>
@@ -28,7 +28,7 @@
 
 
                         <div class="hotel-listing-form">
-                            <form class="text-center" action="{{url('testpage')}}" method="post" enctype="multipart/form-data">
+                            <form class="text-center" action="{{url('testphase')}}" method="post" enctype="multipart/form-data">
                                
                                {{csrf_field()}}
                             
@@ -46,6 +46,29 @@
                                 <textarea class="form-control textarea text-left p-3 h-100"
                                         id="address" name="address" rows="5" placeholder="Enter Address"></textarea>
                         </div><!-- end form-group -->
+                        
+                        <div class="form-row">
+                            <div class="col-md">
+                                <div class="form-group">
+                                    <label for="inputGroupSelect07" class="" for="phone">Phone:</label>
+                                    <input type="text" id="phone" name="phone" class="form-control" placeholder="Enter Phone">
+                                </div><!-- end form-group -->
+                            </div><!-- end column -->
+                        </div><!-- end form-row -->
+                        
+
+                        <div class="input-group mb-4">
+                          <div class="input-group-prepend">
+                            <div class="input-group-text">
+                              
+                                        <input type="radio" 
+                                        id="gender_0" name="gender" value="Male">&nbsp;Male&nbsp; 
+                                        <input type="radio" 
+                                        id="gender_1" name="gender" value="Female">&nbsp;Female&nbsp; 
+                            </div>
+                          </div>
+                          <input type="text" disabled="disabled"  for="gender" class="form-control" value="Select Sex" />
+                        </div>
                         
 
 
